@@ -1,2 +1,2 @@
 # Auto-Fish
-Personally GTA V fishing bot the presses keyboard inputs
+Personally GTA V fishing bot that presses keyboard inputs
