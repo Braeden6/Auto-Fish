@@ -1,4 +1,0 @@
-PyAutoGUI==0.9.52
-playsound==1.2.2
-pywin32==228
-Pillow==8.1.2
