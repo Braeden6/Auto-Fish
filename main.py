@@ -8,6 +8,10 @@ import time
 import os
 import win32api
 from Helpers.gtaKeyPress import *
+import win32gui
+import win32com
+import win32con
+import re
 
 def isGreen(pixel):
     return (pixel[1] > (pixel[0] + DIFFERENCE_GREEN) and pixel[1] > (pixel[2] + DIFFERENCE_GREEN)) #and pixel[1] > 200)
@@ -49,6 +53,9 @@ def checkForMatch(checkImage, images):
 
 def pressGivenKey(key):
     print("Pressing " + str(key))
+    win32api.SetCursorPos((TOP_LEFT_X,TOP_LEFT_Y))
+    win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,TOP_LEFT_X,TOP_LEFT_Y,0,0)
+    win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,TOP_LEFT_X,TOP_LEFT_Y,0,0)
     # human random delay for pressing
     time.sleep(0.35 + random.randrange(1,200)/1000) 
     PressKey(getKeyCode(key))
@@ -120,14 +127,7 @@ def getCursorLocation():
     f.close()
     return location
 
-DIFFERENCE_GREEN = 50 
-
-TOP_LEFT_X = 0#125
-TOP_LEFT_Y = 0#1093
-TOP_RIGHT_X = 0#148
-TOP_RIGHT_Y = 0#1118
-
-if __name__ == '__main__':
+def doAutoFish():
     if (input("Do you need to set up? (y for yes):") == "y"):
         input("move cursor to top left of number")
         [x1,y1] = win32api.GetCursorPos()
@@ -163,3 +163,46 @@ if __name__ == '__main__':
             waitGreenDone()
             print("Checking for catch")  
             time.sleep(4)
+
+DIFFERENCE_GREEN = 50 
+
+TOP_LEFT_X = 0#125
+TOP_LEFT_Y = 0#1093
+TOP_RIGHT_X = 0#148
+TOP_RIGHT_Y = 0#1118
+# 1920 x 1080
+# 2560 x 1440
+# 126 x 1086
+# 146 x 1133
+# 120 x 1023
+# 138 x 1059
+
+if __name__ == '__main__':
+    doAutoFish()
+    '''
+    (TOP_LEFT_X,TOP_RIGHT_X,TOP_LEFT_Y,TOP_RIGHT_Y)=getCursorLocation()
+    print(TOP_LEFT_X*1920/GetSystemMetrics(0))
+    print(TOP_LEFT_Y*1080/GetSystemMetrics(1))'''
+
+
+    '''
+    input("move cursor to top left of number")
+    [x1,y1] = win32api.GetCursorPos()
+    input("move cursor to bottom right of number")
+    [x2,y2] = win32api.GetCursorPos()
+    print(x1, y1)
+    print(x2, y2)'''
+
+    '''
+    # red green blue
+    red = (255,100,100)
+    img = Image.open(os.getcwd() + "/imageFor2.png")
+    image = img.load()
+    (TOP_LEFT_X,TOP_RIGHT_X,TOP_LEFT_Y,TOP_RIGHT_Y)=getCursorLocation()
+    for x in range(TOP_LEFT_X, TOP_RIGHT_X):
+        image[x,TOP_LEFT_Y] = red
+        image[x,TOP_RIGHT_Y] = red
+    for y in range(TOP_LEFT_Y, TOP_RIGHT_Y):
+        image[TOP_LEFT_X,y] = red
+        image[TOP_RIGHT_X,y] = red
+    img.save("test2.png")'''
