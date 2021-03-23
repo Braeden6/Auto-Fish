@@ -13,34 +13,44 @@ import win32com
 import win32con
 import re
 
+
 def isGreen(pixel):
     return (pixel[1] > (pixel[0] + DIFFERENCE_GREEN) and pixel[1] > (pixel[2] + DIFFERENCE_GREEN)) #and pixel[1] > 200)
 
 def checkForGreen():
     while(True):
-        img = PIL.ImageGrab.grab().load()
+        image = PIL.ImageGrab.grab()
+        img = image.load()
         for x in range(0,int(GetSystemMetrics(0)/3)):
             for y in range(int(GetSystemMetrics(1)/2),int(GetSystemMetrics(1)*3/4)):
                 if isGreen(img[x,y]):
+                    saveTestImageB(image)
                     return img
+
+
+def saveTestImage(image):
+    global NUMBER
+    print("saving img")
+    image.save(os.getcwd() + "/imgB1080/imageFor" + str(NUMBER) + ".png", "JPEG")
+    NUMBER +=1
+
 
 def checkForMatchHelper(image1, image2):
     total = 0
     failure = 0
     for x in range(TOP_LEFT_X,TOP_RIGHT_X):
-            for y in range(TOP_LEFT_Y,TOP_RIGHT_Y):
-                if isGreen(image1[x,y]):
+        for y in range(TOP_LEFT_Y,TOP_RIGHT_Y):
+            if isGreen(image1[x,y]):
+                total += 1
+                if not isGreen(image2[x,y]):
+                    failure += 1
+            else:
+                if isGreen(image2[x,y]):
                     total += 1
-                    if not isGreen(image2[x,y]):
-                        failure += 1
-                else:
-                    if isGreen(image2[x,y]):
-                        total += 1
-                        failure += 1
+                    failure += 1
     if (total == 0):
         return 0
     return (1- failure/total)
-
 
 def checkForMatch(checkImage, images):
     percent = []
@@ -61,8 +71,11 @@ def pressGivenKey(key):
     PressKey(getKeyCode(key))
     # human random delay for length of button press
     time.sleep(0.1 + random.randrange(1,100)/1000)
-    ReleaseKey(getKeyCode(key)) 
-
+    ReleaseKey(getKeyCode(key))
+    time.sleep(0.5)
+    image = PIL.ImageGrab.grab()
+    saveTestImageA(image)
+    
 def getKeyInput():
     key = input("Not seen, enter 1-9 to save:")
     try:
@@ -93,15 +106,6 @@ def getSavedImage(number):
     image = Image.open(os.getcwd() + "/images/imageFor" + str(number) + ".png").load()
     return image
 
-# top left = [58, 1037]
-# bottom right = [371,1151]
-#top left = 125 1093
-#bottom right = 148, 1118
-# 52.6 by 29.6
-# 132 1106
-#print(GetSystemMetrics(0)) #width
-#print(GetSystemMetrics(1)) #height
-
 def getImages():
     while(True):
         image = PIL.ImageGrab.grab()
@@ -113,7 +117,7 @@ def getImages():
 
 def loadImages():
     images = []
-    for i in range(1,10):
+    for i in range(1,9):
         try:
             images.append(getSavedImage(i))
         except:
@@ -128,22 +132,32 @@ def getCursorLocation():
     return location
 
 def doAutoFish():
+    while(True):
+        newImage = checkForGreen()
+        print("Got one")
+        key = checkForMatch(newImage, images)
+        pressGivenKey(key)
+        waitGreenDone()
+        print("Checking for catch")  
+        time.sleep(4)
+
+def getNumberBox():
+    global TOP_LEFT_X, TOP_RIGHT_X, TOP_LEFT_Y, TOP_RIGHT_Y
+    TOP_LEFT_X = int(TOP_LEFT_X*GetSystemMetrics(0))
+    TOP_RIGHT_X = int(TOP_RIGHT_X*GetSystemMetrics(0))
+    TOP_LEFT_Y = int(TOP_LEFT_Y*GetSystemMetrics(1))
+    TOP_RIGHT_Y = int(TOP_RIGHT_Y*GetSystemMetrics(1))
+
+DIFFERENCE_GREEN = 50 
+
+TOP_LEFT_X = 0.048828125
+TOP_LEFT_Y = 0.7569444444444444
+TOP_RIGHT_X = 0.05859375
+TOP_RIGHT_Y = 0.7777777777777778
+
+if __name__ == '__main__':
+    '''
     if (input("Do you need to set up? (y for yes):") == "y"):
-        input("move cursor to top left of number")
-        [x1,y1] = win32api.GetCursorPos()
-        input("move cursor to bottom right of number")
-        [x2,y2] = win32api.GetCursorPos()
-        try:
-            f = open(os.getcwd() + "/images/cursorLocation.txt", "w")
-        except:
-            f = open(os.getcwd() + "/images/cursorLocation.txt", "x")
-        print(str(x1), file=f)
-        print(str(x2), file=f)
-        print(str(y1), file=f)
-        print(str(y2), file=f)
-        f.close()
-        print(x1, y1)
-        print(x2, y2)
         while(True):
             newImage = getImages()
             key = getKeyInput()
@@ -155,54 +169,19 @@ def doAutoFish():
     else:
         images = loadImages()
         (TOP_LEFT_X,TOP_RIGHT_X,TOP_LEFT_Y,TOP_RIGHT_Y)=getCursorLocation()
-        while(True):
-            newImage = checkForGreen()
-            print("Got one")
-            key = checkForMatch(newImage, images)
-            pressGivenKey(key)
-            waitGreenDone()
-            print("Checking for catch")  
-            time.sleep(4)
-
-DIFFERENCE_GREEN = 50 
-
-TOP_LEFT_X = 0#125
-TOP_LEFT_Y = 0#1093
-TOP_RIGHT_X = 0#148
-TOP_RIGHT_Y = 0#1118
-# 1920 x 1080
-# 2560 x 1440
-# 126 x 1086
-# 146 x 1133
-# 120 x 1023
-# 138 x 1059
-
-if __name__ == '__main__':
-    doAutoFish()
-    '''
-    (TOP_LEFT_X,TOP_RIGHT_X,TOP_LEFT_Y,TOP_RIGHT_Y)=getCursorLocation()
-    print(TOP_LEFT_X*1920/GetSystemMetrics(0))
-    print(TOP_LEFT_Y*1080/GetSystemMetrics(1))'''
-
+        NUMBER = 0
+        doAutoFish()'''
 
     '''
-    input("move cursor to top left of number")
-    [x1,y1] = win32api.GetCursorPos()
-    input("move cursor to bottom right of number")
-    [x2,y2] = win32api.GetCursorPos()
-    print(x1, y1)
-    print(x2, y2)'''
-
-    '''
-    # red green blue
+    # red green blue  
+    getNumberBox()
     red = (255,100,100)
-    img = Image.open(os.getcwd() + "/imageFor2.png")
+    img = Image.open(os.getcwd() + "/imgB1440/imageFor3.png")
     image = img.load()
-    (TOP_LEFT_X,TOP_RIGHT_X,TOP_LEFT_Y,TOP_RIGHT_Y)=getCursorLocation()
     for x in range(TOP_LEFT_X, TOP_RIGHT_X):
         image[x,TOP_LEFT_Y] = red
         image[x,TOP_RIGHT_Y] = red
     for y in range(TOP_LEFT_Y, TOP_RIGHT_Y):
         image[TOP_LEFT_X,y] = red
         image[TOP_RIGHT_X,y] = red
-    img.save("test2.png")'''
+    img.save("test.png")'''
