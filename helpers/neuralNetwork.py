@@ -40,6 +40,7 @@ if __name__ == '__main__':
         ones[num-1] = 1
         y.append(ones)
     X = np.array(X)/255
+    print(X[0].shape)
     Xtest = X[300:393]
     X = X[0:300]
     y = np.array(y)
