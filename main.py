@@ -3,19 +3,15 @@ from win32api import GetSystemMetrics
 import pyautogui
 import time
 import random
-import time
 import os
 import win32api
 from Helpers.gtaKeyPress import *
 import win32gui
-import win32com
 import win32con
 import re
 import numpy as np
 from sklearn.neural_network import MLPClassifier
-import pickle
-from joblib import dump, load
-
+from joblib import load
 
 def isGreen(pixel):
     return (pixel[1] > (pixel[0] + DIFFERENCE_GREEN) and pixel[1] > (pixel[2] + DIFFERENCE_GREEN)) #and pixel[1] > 200)
@@ -80,7 +76,9 @@ def checkForMatch(image):
                 imageNew[x,y] = image[(x + TOP_LEFT_X), (y + TOP_LEFT_Y)]
     imgNew = imgNew.resize((width,height), Image.ANTIALIAS)
     arr = [np.asarray(imgNew).flatten()]
-    return np.argmax(MODEL.predict_proba(arr))+1
+    pred = MODEL.predict_proba(arr)
+    print(pred)
+    return np.argmax(pred)+1
     
 def doAutoFish():
     while(True):

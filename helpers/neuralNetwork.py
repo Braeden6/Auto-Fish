@@ -59,5 +59,5 @@ if __name__ == '__main__':
             print("saved model, ", correct/y_pred.shape[0])
             break
 
-    #dump(clf,os.path.dirname(os.getcwd()) + "/model.joblib")
+    # dump(clf,os.path.dirname(os.getcwd()) + "/model.joblib")
     # clf = load('model.joblib')
